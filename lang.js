@@ -40,7 +40,7 @@ const LANG = {
     schedule_term_rate: "Muddat: <b>{months}</b> oy | Stavka: <b>{rate}%</b> yillik",
     schedule_monthly: "Oylik to'lov: <b>{payment} so'm</b>",
     schedule_units_note: "<i>(jadvaldagi summalar mingga yaxlitlangan вЂ” \"k\")</i>",
-    schedule_header: "Oy|To'lov|Foiz|Asosiy|Qoldiq",
+    schedule_header: "Oy | To'lov | Foiz | Asosiy | Qoldiq",
   },
   ru: {
     choose_lang: "Tilni tanlang / Р’С‹Р±РµСЂРёС‚Рµ СЏР·С‹Рє:",
@@ -79,7 +79,7 @@ const LANG = {
     schedule_term_rate: "РЎСЂРѕРє: <b>{months}</b> РјРµСЃ. | РЎС‚Р°РІРєР°: <b>{rate}%</b> РіРѕРґРѕРІС‹С…",
     schedule_monthly: "Р•Р¶РµРјРµСЃСЏС‡РЅС‹Р№ РїР»Р°С‚С‘Р¶: <b>{payment} СЃСѓРј</b>",
     schedule_units_note: "<i>(СЃСѓРјРјС‹ РІ С‚Р°Р±Р»РёС†Рµ РѕРєСЂСѓРіР»РµРЅС‹ РґРѕ С‚С‹СЃСЏС‡ вЂ” \"k\")</i>",
-    schedule_header: "РњРµСЃ|РџР»Р°С‚С‘Р¶|РџСЂРѕС†|Р”РѕР»Рі|РћСЃС‚Р°С‚РѕРє",
+    schedule_header: "РњРµСЃ | РџР»Р°С‚С‘Р¶ | РџСЂРѕС† | Р”РѕР»Рі | РћСЃС‚Р°С‚РѕРє",
   },
 };
 
