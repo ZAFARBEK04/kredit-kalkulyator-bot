@@ -1,0 +1,95 @@
+/**
+ * KO'P TILLI MATNLAR (UZ / RU)
+ */
+
+const LANG = {
+  uz: {
+    choose_lang: "Tilni tanlang / Выберите язык:",
+    welcome: "👋 Salom! Men sizga yangi kredit uchun ruxsat etilgan oylik to'lov miqdorini hisoblab beraman (O'zbekiston Markaziy banki talablariga muvofiq).\n\nQuyidagi usullardan birini tanlang:",
+    btn_step: "📝 Bosqichma-bosqich",
+    btn_oneline: "⚡️ Bir xabarda (tez)",
+    btn_lang_uz: "🇺🇿 O'zbekcha",
+    btn_lang_ru: "🇷🇺 Русский",
+    btn_restart: "🔄 Qayta hisoblash",
+    btn_change_lang: "🌐 Tilni o'zgartirish",
+    ask_salary: "💰 Oylik rasmiy maoshingizni kiriting (so'mda).\n\nMasalan: <b>8000000</b>",
+    ask_existing_payment: "💳 Hozirda boshqa kreditlar/mikrokreditlar bo'yicha oyiga to'laydigan umumiy summangizni kiriting (so'mda).\n\nAgar kredit yo'q bo'lsa — <b>0</b> deb yozing.",
+    oneline_instruction: "⚡️ Tez usul: ikkita raqamni bo'sh joy bilan ajratib yuboring:\n\n<b>OYLIK_MAOSH BOSHQA_TOLOVLAR</b>\n\nMasalan: <code>8000000 1000000</code>\n(8 mln maosh, hozir oyiga 1 mln boshqa kredit uchun to'laydi)\n\nAgar boshqa kredit yo'q bo'lsa: <code>8000000 0</code>",
+    error_number: "⚠️ Iltimos, faqat raqam kiriting. Masalan: 8000000",
+    error_oneline_format: "⚠️ Format xato. Ikkita raqamni bo'sh joy bilan kiriting.\n\nMasalan: <code>8000000 1000000</code>",
+    error_negative: "⚠️ Raqam manfiy bo'lishi mumkin emas. Qaytadan kiriting.",
+    error_payment_too_big: "⚠️ Joriy to'lov maoshdan katta bo'lishi mumkin emas. Qaytadan kiriting.",
+    result_title: "📊 <b>HISOBLASH NATIJASI</b>\n",
+    result_salary: "💰 Oylik maosh: <b>{salary} so'm</b>",
+    result_max_debt: "🏦 Ruxsat etilgan maksimal umumiy qarz (8x): <b>{max_debt} so'm</b>",
+    result_max_monthly: "📅 Ruxsat etilgan maksimal oylik to'lov yuki (50%): <b>{max_monthly} so'm</b>",
+    result_existing: "💳 Hozirgi oylik to'lovlaringiz: <b>{existing} so'm</b>",
+    result_available: "\n✅ <b>Yangi kredit uchun oyiga to'lashingiz mumkin bo'lgan maksimal summa:</b>\n<b>{available} so'm</b>",
+    result_no_available: "\n❌ <b>Afsuski, hozirgi to'lovlaringiz allaqachon limitga yetgan yoki undan oshib ketgan.</b>\nYangi kredit olish imkoniyati yo'q.",
+    result_note: "\n\nℹ️ <i>Eslatma: bu — taxminiy hisob-kitob. Yakuniy qaror va aniq shartlar bank/moliya tashkiloti tomonidan belgilanadi.</i>",
+    btn_menu: "📋 Bosh menyu",
+    offers_title: "💼 <b>Muddat bo'yicha mumkin bo'lgan kredit summalari:</b>",
+    offer_line: "▫️ {months} oy ({rate}% yillik) — <b>{amount} so'm</b>",
+    choose_term_for_schedule: "📅 Qaysi muddat uchun to'liq to'lov jadvalini ko'rmoqchisiz?",
+    btn_term_12: "12 oy (29%)",
+    btn_term_24: "24 oy (30%)",
+    btn_term_36: "36 oy (32%)",
+    btn_schedule: "📅 To'lov jadvalini ko'rish",
+    schedule_title: "📅 <b>To'lov jadvali</b>",
+    schedule_principal: "Kredit summasi: <b>{principal} so'm</b>",
+    schedule_term_rate: "Muddat: <b>{months}</b> oy | Stavka: <b>{rate}%</b> yillik",
+    schedule_monthly: "Oylik to'lov: <b>{payment} so'm</b>",
+    schedule_units_note: "<i>(jadvaldagi summalar mingga yaxlitlangan — \"k\")</i>",
+    schedule_header: "Oy | To'lov | Foiz | Asosiy | Qoldiq",
+  },
+  ru: {
+    choose_lang: "Tilni tanlang / Выберите язык:",
+    welcome: "👋 Привет! Я рассчитаю максимально допустимый ежемесячный платёж по новому кредиту (согласно требованиям Центрального банка Узбекистана).\n\nВыберите способ:",
+    btn_step: "📝 Пошагово",
+    btn_oneline: "⚡️ Одним сообщением (быстро)",
+    btn_lang_uz: "🇺🇿 O'zbekcha",
+    btn_lang_ru: "🇷🇺 Русский",
+    btn_restart: "🔄 Новый расчёт",
+    btn_change_lang: "🌐 Сменить язык",
+    ask_salary: "💰 Введите вашу официальную ежемесячную зарплату (в сумах).\n\nНапример: <b>8000000</b>",
+    ask_existing_payment: "💳 Введите общую сумму, которую вы сейчас платите в месяц по другим кредитам/микрокредитам (в сумах).\n\nЕсли кредитов нет — напишите <b>0</b>.",
+    oneline_instruction: "⚡️ Быстрый способ: отправьте два числа через пробел:\n\n<b>ЗАРПЛАТА ДРУГИЕ_ПЛАТЕЖИ</b>\n\nНапример: <code>8000000 1000000</code>\n(зарплата 8 млн, сейчас платит 1 млн в месяц по другим кредитам)\n\nЕсли других кредитов нет: <code>8000000 0</code>",
+    error_number: "⚠️ Пожалуйста, введите только число. Например: 8000000",
+    error_oneline_format: "⚠️ Неверный формат. Введите два числа через пробел.\n\nНапример: <code>8000000 1000000</code>",
+    error_negative: "⚠️ Число не может быть отрицательным. Введите снова.",
+    error_payment_too_big: "⚠️ Текущий платёж не может быть больше зарплаты. Введите снова.",
+    result_title: "📊 <b>РЕЗУЛЬТАТ РАСЧЁТА</b>\n",
+    result_salary: "💰 Ежемесячная зарплата: <b>{salary} сум</b>",
+    result_max_debt: "🏦 Максимально допустимый общий долг (8x): <b>{max_debt} сум</b>",
+    result_max_monthly: "📅 Максимально допустимая долговая нагрузка в месяц (50%): <b>{max_monthly} сум</b>",
+    result_existing: "💳 Текущие ежемесячные платежи: <b>{existing} сум</b>",
+    result_available: "\n✅ <b>Максимальная сумма, которую можно платить по новому кредиту в месяц:</b>\n<b>{available} сум</b>",
+    result_no_available: "\n❌ <b>К сожалению, текущие платежи уже достигли лимита или превышают его.</b>\nВозможность получить новый кредит отсутствует.",
+    result_note: "\n\nℹ️ <i>Примечание: это приближённый расчёт. Окончательное решение и точные условия определяются банком/финансовой организацией.</i>",
+    btn_menu: "📋 Главное меню",
+    offers_title: "💼 <b>Возможные суммы кредита по срокам:</b>",
+    offer_line: "▫️ {months} мес. ({rate}% годовых) — <b>{amount} сум</b>",
+    choose_term_for_schedule: "📅 Для какого срока показать полный график платежей?",
+    btn_term_12: "12 мес. (29%)",
+    btn_term_24: "24 мес. (30%)",
+    btn_term_36: "36 мес. (32%)",
+    btn_schedule: "📅 Показать график платежей",
+    schedule_title: "📅 <b>График платежей</b>",
+    schedule_principal: "Сумма кредита: <b>{principal} сум</b>",
+    schedule_term_rate: "Срок: <b>{months}</b> мес. | Ставка: <b>{rate}%</b> годовых",
+    schedule_monthly: "Ежемесячный платёж: <b>{payment} сум</b>",
+    schedule_units_note: "<i>(суммы в таблице округлены до тысяч — \"k\")</i>",
+    schedule_header: "Мес | Платёж | Проц | Долг | Остаток",
+  },
+};
+
+function t(lang, key, replacements = {}) {
+  const l = LANG[lang] ? lang : 'uz';
+  let text = LANG[l][key] !== undefined ? LANG[l][key] : key;
+  for (const [k, v] of Object.entries(replacements)) {
+    text = text.replace(`{${k}}`, v);
+  }
+  return text;
+}
+
+module.exports = { LANG, t };
