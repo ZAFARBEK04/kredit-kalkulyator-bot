@@ -83,4 +83,23 @@ function formatScheduleTable(lang, principal, months, annualRate) {
   return title + '\n<pre>' + tableText + '</pre>';
 }
 
-module.exports = { formatResultMessage, formatScheduleTable };
+/**
+ * "Erkin kalkulyator" natijasini formatlash - mijoz o'zi
+ * summa, foiz va muddatni kiritgan holat uchun.
+ */
+function formatFreeCalcResult(lang, amount, annualRate, months, monthlyPayment) {
+  const total = monthlyPayment * months;
+  const overpay = total - amount;
+
+  let msg = t(lang, 'free_result_title');
+  msg += '\n' + t(lang, 'free_result_amount', { amount: formatNumber(amount) });
+  msg += '\n' + t(lang, 'free_result_rate', { rate: annualRate });
+  msg += '\n' + t(lang, 'free_result_months', { months });
+  msg += '\n' + t(lang, 'free_result_monthly', { payment: formatNumber(monthlyPayment) });
+  msg += '\n' + t(lang, 'free_result_total', { total: formatNumber(total) });
+  msg += '\n' + t(lang, 'free_result_overpay', { overpay: formatNumber(overpay) });
+  msg += '\n' + t(lang, 'result_note');
+  return msg;
+}
+
+module.exports = { formatResultMessage, formatScheduleTable, formatFreeCalcResult };

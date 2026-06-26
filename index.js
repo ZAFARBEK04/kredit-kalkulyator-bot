@@ -15,9 +15,10 @@ const {
   parseNumber,
   calculateCredit,
   calculateMaxLoanAmount,
+  calculateAnnuityPayment,
   LOAN_TERMS,
 } = require('./calculator');
-const { formatResultMessage, formatScheduleTable } = require('./formatters');
+const { formatResultMessage, formatScheduleTable, formatFreeCalcResult } = require('./formatters');
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 if (!BOT_TOKEN) {
@@ -63,6 +64,7 @@ function mainMenuKeyboard(lang) {
   return Markup.inlineKeyboard([
     [Markup.button.callback(t(lang, 'btn_step'), 'mode_step')],
     [Markup.button.callback(t(lang, 'btn_oneline'), 'mode_oneline')],
+    [Markup.button.callback(t(lang, 'btn_free_calc'), 'mode_free_calc')],
     [Markup.button.callback(t(lang, 'btn_change_lang'), 'change_lang')],
   ]);
 }
@@ -79,6 +81,13 @@ function termChoiceKeyboard(lang) {
     [Markup.button.callback(t(lang, 'btn_term_12'), 'sched_12')],
     [Markup.button.callback(t(lang, 'btn_term_24'), 'sched_24')],
     [Markup.button.callback(t(lang, 'btn_term_36'), 'sched_36')],
+    [Markup.button.callback(t(lang, 'btn_restart'), 'restart')],
+  ]);
+}
+
+function freeCalcResultKeyboard(lang) {
+  return Markup.inlineKeyboard([
+    [Markup.button.callback(t(lang, 'btn_schedule'), 'show_free_schedule')],
     [Markup.button.callback(t(lang, 'btn_restart'), 'restart')],
   ]);
 }
@@ -151,6 +160,15 @@ bot.action('mode_oneline', async (ctx) => {
   await ctx.reply(t(lang, 'oneline_instruction'), { parse_mode: 'HTML' });
 });
 
+bot.action('mode_free_calc', async (ctx) => {
+  await ctx.answerCbQuery();
+  const chatId = ctx.chat.id;
+  const session = getSession(chatId);
+  const lang = session.lang || 'uz';
+  saveSession(chatId, { ...session, state: 'awaiting_free_amount' });
+  await ctx.reply(t(lang, 'free_ask_amount'), { parse_mode: 'HTML' });
+});
+
 // ====== JADVAL KO'RSATISH ======
 
 bot.action('show_schedule', async (ctx) => {
@@ -174,6 +192,22 @@ bot.action(/sched_(12|24|36)/, async (ctx) => {
     const principal = calculateMaxLoanAmount(availableMonthly, months, rate);
     const scheduleMsg = formatScheduleTable(lang, principal, months, rate);
     await ctx.reply(scheduleMsg, { parse_mode: 'HTML', ...afterResultKeyboard(lang) });
+  } else {
+    await sendMainMenu(ctx, lang);
+  }
+});
+
+bot.action('show_free_schedule', async (ctx) => {
+  await ctx.answerCbQuery();
+  const chatId = ctx.chat.id;
+  const session = getSession(chatId);
+  const lang = session.lang || 'uz';
+  const { freeAmount, freeRate, freeMonths } = session;
+
+  if (freeAmount > 0 && freeRate > 0 && freeMonths > 0) {
+    const annualRate = freeRate / 100;
+    const scheduleMsg = formatScheduleTable(lang, freeAmount, freeMonths, annualRate);
+    await ctx.reply(scheduleMsg, { parse_mode: 'HTML', ...freeCalcResultKeyboard(lang) });
   } else {
     await sendMainMenu(ctx, lang);
   }
@@ -248,6 +282,49 @@ bot.on('text', async (ctx) => {
 
     saveSession(chatId, { lang, state: null, availableMonthly: result.availableMonthly });
     await sendBannerMessage(ctx, 'result', resultMsg, afterResultKeyboard(lang));
+    return;
+  }
+
+  // ====== ERKIN KALKULYATOR: summa kutilmoqda ======
+  if (state === 'awaiting_free_amount') {
+    const amount = parseNumber(text);
+    if (amount === null || amount <= 0) return ctx.reply(t(lang, 'error_amount_invalid'));
+
+    saveSession(chatId, { ...session, freeAmount: amount, state: 'awaiting_free_rate' });
+    return ctx.reply(t(lang, 'free_ask_rate'), { parse_mode: 'HTML' });
+  }
+
+  // ====== ERKIN KALKULYATOR: foiz stavkasi kutilmoqda ======
+  if (state === 'awaiting_free_rate') {
+    const rate = parseNumber(text);
+    if (rate === null || rate <= 0) return ctx.reply(t(lang, 'error_rate_invalid'));
+
+    saveSession(chatId, { ...session, freeRate: rate, state: 'awaiting_free_months' });
+    return ctx.reply(t(lang, 'free_ask_months'), { parse_mode: 'HTML' });
+  }
+
+  // ====== ERKIN KALKULYATOR: muddat kutilmoqda - yakuniy hisoblash ======
+  if (state === 'awaiting_free_months') {
+    const months = parseNumber(text);
+    if (months === null || months <= 0 || !Number.isInteger(months)) {
+      return ctx.reply(t(lang, 'error_months_invalid'));
+    }
+
+    const amount = session.freeAmount;
+    const ratePercent = session.freeRate;
+    const annualRate = ratePercent / 100;
+    const monthlyPayment = calculateAnnuityPayment(amount, months, annualRate);
+
+    const resultMsg = formatFreeCalcResult(lang, amount, ratePercent, months, monthlyPayment);
+
+    saveSession(chatId, {
+      lang,
+      state: null,
+      freeAmount: amount,
+      freeRate: ratePercent,
+      freeMonths: months,
+    });
+    await sendBannerMessage(ctx, 'result', resultMsg, freeCalcResultKeyboard(lang));
     return;
   }
 
