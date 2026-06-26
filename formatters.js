@@ -1,7 +1,6 @@
 const { t } = require('./lang');
 const {
   formatNumber,
-  formatShort,
   calculateAllTermsOffers,
   buildAmortizationSchedule,
 } = require('./calculator');
@@ -35,22 +34,43 @@ function formatResultMessage(lang, result) {
 
 /**
  * Amortizatsiya jadvalini Telegram xabari uchun formatlash.
- * Telefon ekraniga to'liq sig'ishi uchun monospace (<pre>) va qisqa ustun nomlari ishlatiladi.
+ * To'liq sonlar (bo'shliq bilan ajratilgan), ustunlar dinamik kenglikda
+ * to'g'ri tekislanadi. <pre> (monospace) Telegram'da odatdagidan
+ * kichikroq shrift bilan chiqadi, shuning uchun telefon ekraniga ham sig'adi.
  */
 function formatScheduleTable(lang, principal, months, annualRate) {
   const schedule = buildAmortizationSchedule(principal, months, annualRate);
   const monthlyPayment = schedule[0].payment;
 
-  const header = t(lang, 'schedule_header');
-  const lines = [header, '-'.repeat(38)];
+  // Har bir ustun uchun barcha qiymatlarni avval formatlab, eng katta uzunlikni topamiz
+  const monthCol = schedule.map((r) => String(r.month));
+  const paymentCol = schedule.map((r) => formatNumber(r.payment));
+  const interestCol = schedule.map((r) => formatNumber(r.interest));
+  const principalCol = schedule.map((r) => formatNumber(r.principal));
+  const balanceCol = schedule.map((r) => formatNumber(r.balance));
 
-  for (const row of schedule) {
-    const monthStr = String(row.month).padEnd(3);
-    const paymentStr = formatShort(row.payment).padStart(7);
-    const interestStr = formatShort(row.interest).padStart(6);
-    const principalStr = formatShort(row.principal).padStart(7);
-    const balanceStr = formatShort(row.balance).padStart(8);
-    lines.push(`${monthStr} ${paymentStr} ${interestStr} ${principalStr} ${balanceStr}`);
+  const headerParts = t(lang, 'schedule_header').split('|').map((s) => s.trim());
+  const widths = [
+    Math.max(headerParts[0].length, ...monthCol.map((s) => s.length)),
+    Math.max(headerParts[1].length, ...paymentCol.map((s) => s.length)),
+    Math.max(headerParts[2].length, ...interestCol.map((s) => s.length)),
+    Math.max(headerParts[3].length, ...principalCol.map((s) => s.length)),
+    Math.max(headerParts[4].length, ...balanceCol.map((s) => s.length)),
+  ];
+
+  const headerLine = headerParts.map((s, i) => s.padEnd(widths[i])).join('|');
+  const sepLine = '-'.repeat(headerLine.length);
+
+  const lines = [headerLine, sepLine];
+  for (let i = 0; i < schedule.length; i++) {
+    const row = [
+      monthCol[i].padEnd(widths[0]),
+      paymentCol[i].padStart(widths[1]),
+      interestCol[i].padStart(widths[2]),
+      principalCol[i].padStart(widths[3]),
+      balanceCol[i].padStart(widths[4]),
+    ];
+    lines.push(row.join('|'));
   }
 
   const tableText = lines.join('\n');
@@ -58,8 +78,7 @@ function formatScheduleTable(lang, principal, months, annualRate) {
   const title = t(lang, 'schedule_title') + '\n'
     + t(lang, 'schedule_principal', { principal: formatNumber(principal) }) + '\n'
     + t(lang, 'schedule_term_rate', { months, rate: Math.round(annualRate * 100) }) + '\n'
-    + t(lang, 'schedule_monthly', { payment: formatNumber(monthlyPayment) }) + '\n'
-    + t(lang, 'schedule_units_note') + '\n';
+    + t(lang, 'schedule_monthly', { payment: formatNumber(monthlyPayment) }) + '\n';
 
   return title + '\n<pre>' + tableText + '</pre>';
 }
